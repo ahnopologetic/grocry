@@ -72,7 +72,7 @@ async def crawl_traderjoes(
             max_concurrent=max_concurrent,
             target_file=target_file,
         )
-        scraper.run(start_url=url)
+        await scraper.run(start_url=url)
 
         save_products(target_file)
 
