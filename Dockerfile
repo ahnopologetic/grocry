@@ -12,5 +12,7 @@ RUN uv sync --locked
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+RUN uv run crawl4ai-setup && uv run crawl4ai-doctor
+
 # Command to run the application
 CMD ["uv", "run", "python", "-m", "grocry.api"]

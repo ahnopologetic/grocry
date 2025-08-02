@@ -1,4 +1,6 @@
+import asyncio
 from typing import List
+
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -6,6 +8,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from grocry.api.db import get_db, init_db, Product as DbProduct
+from grocry.crawl.core.db import save_products
+from grocry.crawl.traderjoe import TraderJoesScraper
 
 app = FastAPI()
 app.add_middleware(
@@ -53,6 +57,25 @@ async def products_matching_price(
         Product(name=product.name, price=product.price, url=product.url)
         for product in products
     ]
+
+
+@app.post("/crawl-traderjoes")
+async def crawl_traderjoes(
+    url: str,
+    max_products: int = 1000,
+    max_concurrent: int = 5,
+    target_file: str = "result-beverage.json",
+):
+    async def run_and_save():
+        scraper = TraderJoesScraper(
+            max_products=max_products, max_concurrent=max_concurrent
+        )
+        scraper.run(start_url=url, target_file=target_file)
+
+        save_products(target_file)
+
+    asyncio.create_task(run_and_save())
+    return {"message": "Crawling started"}
 
 
 if __name__ == "__main__":
