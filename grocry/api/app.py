@@ -68,9 +68,11 @@ async def crawl_traderjoes(
 ):
     async def run_and_save():
         scraper = TraderJoesScraper(
-            max_products=max_products, max_concurrent=max_concurrent
+            max_products=max_products,
+            max_concurrent=max_concurrent,
+            target_file=target_file,
         )
-        scraper.run(start_url=url, target_file=target_file)
+        scraper.run(start_url=url)
 
         save_products(target_file)
 
